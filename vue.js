@@ -142,23 +142,26 @@ function makeMap (
 }
 
 /**
- * Check if a tag is a built-in tag.
+ * Check if a tag is a built-in tag. 检查标签是否为内置标签
  */
+//检查标签是否为内置标签不区分大小写 返回fn（val） 例如 isBuiltInTag（slot）返回true
 var isBuiltInTag = makeMap('slot,component', true);
 
 /**
  * Check if a attribute is a reserved attribute.
  */
+//检查属性是否为保留属性 区分大小写 返回fn（val） 例如 isReservedAttribute（key）返回true
 var isReservedAttribute = makeMap('key,ref,slot,slot-scope,is');
 
 /**
  * Remove an item from an array
  */
+// 移出数组中的某项 返回修改后的数组
 function remove (arr, item) {
-  if (arr.length) {
-    var index = arr.indexOf(item);
-    if (index > -1) {
-      return arr.splice(index, 1)
+  if (arr.length) { //数组长度>
+    var index = arr.indexOf(item); //获取要删除的item值得 索引
+    if (index > -1) { //判断是否存在
+      return arr.splice(index, 1)  //截取删除本item 返回修改后的原数组
     }
   }
 }
