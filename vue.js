@@ -19,22 +19,22 @@ var emptyObject = Object.freeze({}); //冻结 返回一个不可以修改 删除
 // these helpers produces better vm code in JS engines due to their
 // explicitness and function inlining
 
-//isUndef(v)  如果传入的值为undefined 或者为null 返回undefined ||null||v 返回本身值
+//isUndef(v)  全等严格判断返回true或者false
 function isUndef (v) {
   return v === undefined || v === null
 }
 
-//同样返回 undefined ||null||v 返回本身值
+//同样返回 全等严格判断返回true或者false
 function isDef (v) {
   return v !== undefined && v !== null
 }
 
-//返回本身 v
+//全等判断 只有true才返回true 其余都返回false
 function isTrue (v) {
   return v === true
 }
 
-//返回本身 v
+//全等判断 只有false才返回true 其余都返回false
 function isFalse (v) {
   return v === false
 }
@@ -42,7 +42,7 @@ function isFalse (v) {
 /**
  * Check if value is primitive
  */
-// 判断是不是基本类型 返回本身 value
+// 判断是不是基本类型 返回本身 true 或者false
 function isPrimitive (value) {
   return (
     typeof value === 'string' ||
