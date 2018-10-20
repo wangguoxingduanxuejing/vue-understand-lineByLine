@@ -130,7 +130,7 @@ function toNumber (val) {
 function makeMap (
   str,
   expectsLowerCase 
-) {
+  ) {
   var map = Object.create(null); //重要方法 创建一个property 为null的对象
   var list = str.split(','); // list 以，分割后的数组
   for (var i = 0; i < list.length; i++) {
@@ -161,7 +161,7 @@ function remove (arr, item) {
   if (arr.length) { //数组长度>
     var index = arr.indexOf(item); //获取要删除的item值得 索引
     if (index > -1) { //判断是否存在
-      return arr.splice(index, 1)  //截取删除本item 返回修改后的原数组
+      return arr.splice(index, 1)  //截取删除本item  返回[item]
     }
   }
 }
@@ -169,43 +169,50 @@ function remove (arr, item) {
 /**
  * Check whether the object has the property.
  */
+// 变量赋值
 var hasOwnProperty = Object.prototype.hasOwnProperty;
+//判断是不是自有属性 返回true false 不包括prototype上的属性
 function hasOwn (obj, key) {
   return hasOwnProperty.call(obj, key)
 }
 
 /**
  * Create a cached version of a pure function.
+ * 传入参数 fn
+ * 传出参数 fno(str) 缓存对象cache  key:str value:fn(key)返回值
  */
 function cached (fn) {
-  var cache = Object.create(null);
-  return (function cachedFn (str) {
-    var hit = cache[str];
-    return hit || (cache[str] = fn(str))
+  var cache = Object.create(null); //创建一个原型对象为null的对象
+  return (function cachedFn (str) {  //返回一个方法（执行此方法拿到缓存对象key中存在的值）
+    var hit = cache[str];   //变量记录
+    return hit || (cache[str] = fn(str)) //返回缓存对象中key的值
   })
 }
 
 /**
  * Camelize a hyphen-delimited string.
  */
-var camelizeRE = /-(\w)/g;
-var camelize = cached(function (str) {
-  return str.replace(camelizeRE, function (_, c) { return c ? c.toUpperCase() : ''; })
+//名字格式化 传入test-demo :testDemo 传入test_demo 返回test_demo 一满足命名规范
+var camelizeRE = /-(\w)/g; //创建正则表达式 -[A-Za-z0-9_]
+var camelize = cached(function (str) { //返回一个方法
+  return str.replace(camelizeRE, function (_, c) { return c ? c.toUpperCase() : ''; })//返回一个替换后的字符串 注意replace 详细方法
 });
 
 /**
  * Capitalize a string.
  */
+//名字首字母大写 返回的是一个方法  例如 demo 返回Demo
 var capitalize = cached(function (str) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
+  return str.charAt(0).toUpperCase() + str.slice(1) //首字母大写 再加上从第二个字符开始的副本 
 });
 
 /**
  * Hyphenate a camelCase string.
  */
-var hyphenateRE = /\B([A-Z])/g;
+//名字格式化 传入testDemo 返回test-demo test_demo 返回test_demo testD_emo test-d_emo
+var hyphenateRE = /\B([A-Z])/g; //正则 字符与大写字母之间分割的大写字母分割符
 var hyphenate = cached(function (str) {
-  return str.replace(hyphenateRE, '-$1').toLowerCase()
+  return str.replace(hyphenateRE, '-$1').toLowerCase() //先替换成-[A-Z]去不转换成小写
 });
 
 /**
@@ -217,24 +224,24 @@ var hyphenate = cached(function (str) {
  */
 
 /* istanbul ignore next */
+// fn 传入的回调方法  ctx fn内部this 指向
 function polyfillBind (fn, ctx) {
-  function boundFn (a) {
-    var l = arguments.length;
-    return l
-      ? l > 1
-        ? fn.apply(ctx, arguments)
-        : fn.call(ctx, a)
-      : fn.call(ctx)
+  function boundFn (a) {  //定义一个函数（一个形参）用于返回 
+    var l = arguments.length; //l 是实际参数的个数
+    //l =0 =1 >1 三种情况
+    return l ? l > 1 ? fn.apply(ctx, arguments) : fn.call(ctx, a) : fn.call(ctx)
   }
 
-  boundFn._length = fn.length;
-  return boundFn
+  boundFn._length = fn.length; //fn 的形参个数 boundFn  _length为fn形参个数 length 为boundFn本身形参个数
+  return boundFn //返回一个方法
 }
 
+//本地绑定 fn 指针改变为 ctx 后返回
 function nativeBind (fn, ctx) {
   return fn.bind(ctx)
 }
 
+// 兼容处理 如果Function 不存在bind方法 bind = polyfillBind 如果存在 bind = nativeBind
 var bind = Function.prototype.bind
   ? nativeBind
   : polyfillBind;
@@ -242,22 +249,25 @@ var bind = Function.prototype.bind
 /**
  * Convert an Array-like object to a real Array.
  */
+//数据集合 （伪数组结构） 转换成真正的数组 list集合  start开始索引
 function toArray (list, start) {
-  start = start || 0;
-  var i = list.length - start;
-  var ret = new Array(i);
+  start = start || 0; //start不传  从0开始
+  var i = list.length - start; //计算数组的长度
+  var ret = new Array(i); //创建固定数组的长度
   while (i--) {
-    ret[i] = list[i + start];
+    ret[i] = list[i + start];  //循环写入数组
   }
-  return ret
+  return ret  //返回新数组
 }
 
 /**
  * Mix properties into target object.
  */
+//混和对象属性 to 目标对象 _from来源对象
+// 浅拷贝 切存在相同key 值得覆盖问题
 function extend (to, _from) {
   for (var key in _from) {
-    to[key] = _from[key];
+    to[key] = _from[key]; //拷贝赋值
   }
   return to
 }
@@ -265,11 +275,12 @@ function extend (to, _from) {
 /**
  * Merge an Array of Objects into a single Object.
  */
+//数组[{}，{}，{}]转换成唯一的对象 多个对象有相同的key 会被覆盖值  注意
 function toObject (arr) {
   var res = {};
   for (var i = 0; i < arr.length; i++) {
     if (arr[i]) {
-      extend(res, arr[i]);
+      extend(res, arr[i]); //相当于嵌套循环
     }
   }
   return res
@@ -280,21 +291,25 @@ function toObject (arr) {
  * Stubbing args to make Flow happy without leaving useless transpiled code
  * with ...rest (https://flow.org/blog/2017/05/07/Strict-Function-Call-Arity/)
  */
-function noop (a, b, c) {}
+function noop (a, b, c) {} //不做操作的方法
 
 /**
  * Always return false.
  */
-var no = function (a, b, c) { return false; };
+var no = function (a, b, c) { return false; }; //永远返回false
 
 /**
  * Return same value
  */
-var identity = function (_) { return _; };
+var identity = function (_) { return _; }; //身份 传入什么返回什么
 
 /**
  * Generate a static keys string from compiler modules.
+ * 从编译器模块生成静态键字符串
  */
+//modules 的结构为[{staticKeys:["key1","key2"]},{staticKeys:["key3","key4"]}]
+// 返回的结果为 key1,key2,key3,key4
+//注意Array的 reduce()方法
 function genStaticKeys (modules) {
   return modules.reduce(function (keys, m) {
     return keys.concat(m.staticKeys || [])
@@ -305,67 +320,71 @@ function genStaticKeys (modules) {
  * Check if two values are loosely equal - that is,
  * if they are plain objects, do they have the same shape?
  */
+
+ //宽松验证  例如两个对象 只看keys 是不是一样不看keys 的vakue  就是比较两a b 的形状 不一定全部相等
 function looseEqual (a, b) {
-  if (a === b) { return true }
-  var isObjectA = isObject(a);
-  var isObjectB = isObject(b);
-  if (isObjectA && isObjectB) {
+  if (a === b) { return true } //如果a全等于b return true 结束函数
+  var isObjectA = isObject(a); //判断a是不是对象 且不是null
+  var isObjectB = isObject(b); //判断b是不是对象 且不是null
+  if (isObjectA && isObjectB) { // 如果两个都是对象 继续比较
     try {
-      var isArrayA = Array.isArray(a);
-      var isArrayB = Array.isArray(b);
-      if (isArrayA && isArrayB) {
+      var isArrayA = Array.isArray(a);//判断a是不是数组
+      var isArrayB = Array.isArray(b);////判断b是不是数组
+      if (isArrayA && isArrayB) { //两个都是数组
         return a.length === b.length && a.every(function (e, i) {
-          return looseEqual(e, b[i])
+          return looseEqual(e, b[i])//如果数组元素仍未数组对象  则发生递归调用 every方法 返回值为true或者false  有一个不成立 则返回false
         })
-      } else if (!isArrayA && !isArrayB) {
-        var keysA = Object.keys(a);
-        var keysB = Object.keys(b);
+      } else if (!isArrayA && !isArrayB) {//两个都不是数组
+        var keysA = Object.keys(a);//获得a对象 keys的数组
+        var keysB = Object.keys(b);//获得b对象 keys的数组
         return keysA.length === keysB.length && keysA.every(function (key) {
-          return looseEqual(a[key], b[key])
+          return looseEqual(a[key], b[key])  //返回的额key的比较结果
         })
-      } else {
+      } else {//其他情况
         /* istanbul ignore next */
-        return false
+        return false  //其他情况 返回false
       }
     } catch (e) {
       /* istanbul ignore next */
-      return false
+      return false //转换比较中  出现异常 返回false
     }
-  } else if (!isObjectA && !isObjectB) {
-    return String(a) === String(b)
-  } else {
+  } else if (!isObjectA && !isObjectB) {//如果两个都不是对象（可能都是基本类型）转成字符串 看看是不是相等
+    return String(a) === String(b) //返回全等比较后的值
+  } else {//其他情况 返回false
     return false
   }
 }
-
+// 判断值是不是包含在数组中 只是宽松包含 
 function looseIndexOf (arr, val) {
   for (var i = 0; i < arr.length; i++) {
-    if (looseEqual(arr[i], val)) { return i }
+    if (looseEqual(arr[i], val)) { return i } //包含 返回索引
   }
-  return -1
+  return -1 //不包含 返回-1
 }
 
 /**
  * Ensure a function is called only once.
  */
+//确保函数只被调用了一次  第一次调用执行函数 第二次调用不在执行
 function once (fn) {
-  var called = false;
+  var called = false; //记录函数调用状态
   return function () {
-    if (!called) {
-      called = true;
-      fn.apply(this, arguments);
+    if (!called) {//判断是否被调用
+      called = true; //修改状态 函数已经被调用
+      fn.apply(this, arguments);// 执行调用
     }
   }
 }
-
+//数据服务提供
 var SSR_ATTR = 'data-server-rendered';
 
+//资源类型数组
 var ASSET_TYPES = [
   'component',
   'directive',
   'filter'
 ];
-
+//生命周期钩子函数 名字
 var LIFECYCLE_HOOKS = [
   'beforeCreate',
   'created',
@@ -381,7 +400,7 @@ var LIFECYCLE_HOOKS = [
 ];
 
 /*  */
-
+//配置文件 目前不知道什么用处
 var config = ({
   /**
    * Option merge strategies (used in core/util/options)
@@ -446,7 +465,7 @@ var config = ({
    * Check if a tag is an unknown element.
    * Platform-dependent.
    */
-  isUnknownElement: no,
+  isUnknownElement: no, //永远返回false
 
   /**
    * Get the namespace of an element
@@ -456,7 +475,7 @@ var config = ({
   /**
    * Parse the real tag name for the specific platform.
    */
-  parsePlatformTagName: identity,
+  parsePlatformTagName: identity, //传入什么 返回什么
 
   /**
    * Check if an attribute must be bound using property, e.g. value
@@ -475,6 +494,7 @@ var config = ({
 /**
  * Check if a string starts with $ or _
  */
+//判断str 是否为$ 或者_ 是返回true
 function isReserved (str) {
   var c = (str + '').charCodeAt(0);
   return c === 0x24 || c === 0x5F
