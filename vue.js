@@ -84,7 +84,7 @@ function isPlainObject (obj) {
   return _toString.call(obj) === '[object Object]'
 }
 
-//严格确认是不是RegExp对象 返回true 或者false
+//严格确认是不是RegExp对象 返回true 或者false 
 function isRegExp (v) {
   return _toString.call(v) === '[object RegExp]'
 }
